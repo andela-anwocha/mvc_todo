@@ -9,4 +9,7 @@ $(document).ready(function(){
   $('a.btn-flat').click(function(){
     $('li.collection-item .invisible-content').hide("slow");
   })
+
+  $( "ul.collection" ).draggable();
+  $( ".card" ).draggable();
 });

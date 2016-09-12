@@ -16,6 +16,7 @@ ul.collection {
   position: absolute;
   left: 60%;
   top: 10%;
+  cursor: move;
 }
 
 ul.collection .collection-header {
