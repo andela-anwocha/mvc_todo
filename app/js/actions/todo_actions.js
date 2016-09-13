@@ -6,10 +6,17 @@ export function addItem() {
   });
 }
 
-export function saveItem(text) {
+export function updateItem(index) {
   AppDispatcher.handleViewAction({
-    actionType: "SAVE_ITEM",
-    text: text,
+    actionType: "UPDATE_ITEM",
+    index: index,
+  });
+}
+
+export function viewItem(info) {
+  AppDispatcher.handleViewAction({
+    actionType: "VIEW_ITEM",
+    info: info
   });
 }
 

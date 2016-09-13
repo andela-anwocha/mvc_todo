@@ -6,9 +6,6 @@ $(document).ready(function(){
   //   context.find('.invisible-content').toggle("slow");
   // })
 
-  $('a.btn-flat').click(function(){
-    $('li.collection-item .invisible-content').hide("slow");
-  })
 
   $( "ul.collection" ).draggable();
   $( ".card" ).draggable();

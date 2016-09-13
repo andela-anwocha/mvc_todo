@@ -1,7 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { viewItem } from "../actions/todo_actions.js";
 
 class ListItem extends React.Component {
+
+    constructor(){
+      super();
+      this._viewItem = this._viewItem.bind(this);
+    }
+
     render(){
       let title = this.props.info.title;
       let description = this.props.info.description;
@@ -19,7 +26,7 @@ class ListItem extends React.Component {
                   </a>
                 </div>
                 <div className="invisible-content">
-                  <a className="left-btn btn-flat">
+                  <a className="left-btn btn-flat" onClick={this._viewItem}>
                     View
                   </a>
                   <a className="right-btn btn-flat">
@@ -35,14 +42,18 @@ class ListItem extends React.Component {
 
     _attachListener(){
       let node = ReactDOM.findDOMNode(this);
+      node = $(node).find('span.item-text');
       $(node).click(function(){
-        var context =   $(node).closest('.collection-item');
+        let context =   $(node).closest('.collection-item');
         $('li.collection-item').find('.invisble-content').not(context.find('.invisible-content')).hide();
 
         context.find('.invisible-content').toggle("slow");
       })
     }
 
+    _viewItem(){
+      viewItem(this.props.info);
+    }
 }
 
 export {ListItem};

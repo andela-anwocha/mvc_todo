@@ -21977,7 +21977,7 @@
 	
 	var _list_item = __webpack_require__(/*! ./list_item.jsx */ 173);
 	
-	var _search = __webpack_require__(/*! ./search.jsx */ 174);
+	var _search = __webpack_require__(/*! ./search.jsx */ 179);
 	
 	var _blank_list_item = __webpack_require__(/*! ./blank_list_item.jsx */ 180);
 	
@@ -22089,6 +22089,8 @@
 	
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 	
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22103,7 +22105,10 @@
 	  function ListItem() {
 	    _classCallCheck(this, ListItem);
 	
-	    return _possibleConstructorReturn(this, (ListItem.__proto__ || Object.getPrototypeOf(ListItem)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (ListItem.__proto__ || Object.getPrototypeOf(ListItem)).call(this));
+	
+	    _this._viewItem = _this._viewItem.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(ListItem, [{
@@ -22148,7 +22153,7 @@
 	          { className: "invisible-content" },
 	          _react2.default.createElement(
 	            "a",
-	            { className: "left-btn btn-flat" },
+	            { className: "left-btn btn-flat", onClick: this._viewItem },
 	            "View"
 	          ),
 	          _react2.default.createElement(
@@ -22168,12 +22173,18 @@
 	    key: "_attachListener",
 	    value: function _attachListener() {
 	      var node = _reactDom2.default.findDOMNode(this);
+	      node = $(node).find('span.item-text');
 	      $(node).click(function () {
 	        var context = $(node).closest('.collection-item');
 	        $('li.collection-item').find('.invisble-content').not(context.find('.invisible-content')).hide();
 	
 	        context.find('.invisible-content').toggle("slow");
 	      });
+	    }
+	  }, {
+	    key: "_viewItem",
+	    value: function _viewItem() {
+	      (0, _todo_actions.viewItem)(this.props.info);
 	    }
 	  }]);
 	
@@ -22184,80 +22195,6 @@
 
 /***/ },
 /* 174 */
-/*!**************************************!*\
-  !*** ./app/js/components/search.jsx ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.Search = undefined;
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 175);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Search = function (_React$Component) {
-	  _inherits(Search, _React$Component);
-	
-	  function Search() {
-	    _classCallCheck(this, Search);
-	
-	    return _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).apply(this, arguments));
-	  }
-	
-	  _createClass(Search, [{
-	    key: "render",
-	    value: function render() {
-	      var _this2 = this;
-	
-	      return _react2.default.createElement(
-	        "div",
-	        null,
-	        _react2.default.createElement(
-	          "div",
-	          { className: "search-wrapper input-field" },
-	          _react2.default.createElement("input", { type: "text", placeholder: "Search TodoList...", ref: function ref(data) {
-	              return _this2.searchData = data;
-	            }, onKeyUp: this._keyUp.bind(this) }),
-	          _react2.default.createElement(
-	            "i",
-	            { className: "material-icons" },
-	            "search"
-	          )
-	        ),
-	        _react2.default.createElement("div", { className: "horizontal-rule" })
-	      );
-	    }
-	  }, {
-	    key: "_keyUp",
-	    value: function _keyUp() {
-	      (0, _todo_actions.searchItem)(this.searchData.value);
-	    }
-	  }]);
-	
-	  return Search;
-	}(_react2.default.Component);
-	
-	exports.Search = Search;
-
-/***/ },
-/* 175 */
 /*!****************************************!*\
   !*** ./app/js/actions/todo_actions.js ***!
   \****************************************/
@@ -22269,11 +22206,12 @@
 	  value: true
 	});
 	exports.addItem = addItem;
-	exports.saveItem = saveItem;
+	exports.updateItem = updateItem;
+	exports.viewItem = viewItem;
 	exports.removeItem = removeItem;
 	exports.searchItem = searchItem;
 	
-	var _app_dispatcher = __webpack_require__(/*! ../dispatcher/app_dispatcher.js */ 176);
+	var _app_dispatcher = __webpack_require__(/*! ../dispatcher/app_dispatcher.js */ 175);
 	
 	var _app_dispatcher2 = _interopRequireDefault(_app_dispatcher);
 	
@@ -22285,10 +22223,17 @@
 	  });
 	}
 	
-	function saveItem(text) {
+	function updateItem(index) {
 	  _app_dispatcher2.default.handleViewAction({
-	    actionType: "SAVE_ITEM",
-	    text: text
+	    actionType: "UPDATE_ITEM",
+	    index: index
+	  });
+	}
+	
+	function viewItem(info) {
+	  _app_dispatcher2.default.handleViewAction({
+	    actionType: "VIEW_ITEM",
+	    info: info
 	  });
 	}
 	
@@ -22307,7 +22252,7 @@
 	}
 
 /***/ },
-/* 176 */
+/* 175 */
 /*!*********************************************!*\
   !*** ./app/js/dispatcher/app_dispatcher.js ***!
   \*********************************************/
@@ -22321,7 +22266,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _flux = __webpack_require__(/*! flux */ 177);
+	var _flux = __webpack_require__(/*! flux */ 176);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -22356,7 +22301,7 @@
 	exports.default = AppDispatcher;
 
 /***/ },
-/* 177 */
+/* 176 */
 /*!*************************!*\
   !*** ./~/flux/index.js ***!
   \*************************/
@@ -22371,11 +22316,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 178);
+	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 177);
 
 
 /***/ },
-/* 178 */
+/* 177 */
 /*!**********************************!*\
   !*** ./~/flux/lib/Dispatcher.js ***!
   \**********************************/
@@ -22400,7 +22345,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 179);
+	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 178);
 	
 	var _prefix = 'ID_';
 	
@@ -22615,7 +22560,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
 
 /***/ },
-/* 179 */
+/* 178 */
 /*!****************************************!*\
   !*** ./~/flux/~/fbjs/lib/invariant.js ***!
   \****************************************/
@@ -22671,6 +22616,80 @@
 	
 	module.exports = invariant;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! ./~/process/browser.js */ 3)))
+
+/***/ },
+/* 179 */
+/*!**************************************!*\
+  !*** ./app/js/components/search.jsx ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Search = undefined;
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Search = function (_React$Component) {
+	  _inherits(Search, _React$Component);
+	
+	  function Search() {
+	    _classCallCheck(this, Search);
+	
+	    return _possibleConstructorReturn(this, (Search.__proto__ || Object.getPrototypeOf(Search)).apply(this, arguments));
+	  }
+	
+	  _createClass(Search, [{
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+	
+	      return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	          "div",
+	          { className: "search-wrapper input-field" },
+	          _react2.default.createElement("input", { type: "text", placeholder: "Search TodoList...", ref: function ref(data) {
+	              return _this2.searchData = data;
+	            }, onKeyUp: this._keyUp.bind(this) }),
+	          _react2.default.createElement(
+	            "i",
+	            { className: "material-icons" },
+	            "search"
+	          )
+	        ),
+	        _react2.default.createElement("div", { className: "horizontal-rule" })
+	      );
+	    }
+	  }, {
+	    key: "_keyUp",
+	    value: function _keyUp() {
+	      (0, _todo_actions.searchItem)(this.searchData.value);
+	    }
+	  }]);
+	
+	  return Search;
+	}(_react2.default.Component);
+	
+	exports.Search = Search;
 
 /***/ },
 /* 180 */
@@ -22750,7 +22769,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _app_dispatcher = __webpack_require__(/*! ../dispatcher/app_dispatcher.js */ 176);
+	var _app_dispatcher = __webpack_require__(/*! ../dispatcher/app_dispatcher.js */ 175);
 	
 	var _app_dispatcher2 = _interopRequireDefault(_app_dispatcher);
 	
@@ -22766,6 +22785,7 @@
 	
 	var CHANGE_EVENT = 'change';
 	var SEARCH_EVENT = 'search';
+	var VIEW_EVENT = 'view';
 	
 	var _store = {
 	  list: [{ id: 1, title: "Wake the Dog", description: "Dog should wake" }, { id: 2, title: "Wash the car", description: "Car Clean" }],
@@ -22773,6 +22793,8 @@
 	};
 	
 	var _search_list = void 0;
+	var _list_item = void 0;
+	var _temp_list_item = void 0;
 	
 	var TodoStoreClass = function (_EventEmitter) {
 	  _inherits(TodoStoreClass, _EventEmitter);
@@ -22794,6 +22816,11 @@
 	      this.on(SEARCH_EVENT, cb);
 	    }
 	  }, {
+	    key: 'addViewListener',
+	    value: function addViewListener(cb) {
+	      this.on(VIEW_EVENT, cb);
+	    }
+	  }, {
 	    key: 'removeChangeListener',
 	    value: function removeChangeListener(cb) {
 	      this.removeListener(CHANGE_EVENT, cb);
@@ -22807,6 +22834,16 @@
 	    key: 'getSearchList',
 	    value: function getSearchList() {
 	      return _search_list;
+	    }
+	  }, {
+	    key: 'getListItem',
+	    value: function getListItem() {
+	      return _list_item;
+	    }
+	  }, {
+	    key: 'setTempItem',
+	    value: function setTempItem(item) {
+	      _temp_list_item = item;
 	    }
 	  }]);
 	
@@ -22826,10 +22863,17 @@
 	        TodoStore.emit(CHANGE_EVENT);
 	        break;
 	
-	      case "SAVE_ITEM":
-	        _store.list.push(action.text);
-	        _store.editing = false;
-	        TodoStore.emit(CHANGE_EVENT);
+	      case "UPDATE_ITEM":
+	        if (_temp_list_item != undefined && action.index == _temp_list_item.id) {
+	          _store.list[action.index - 1] = _temp_list_item;
+	          _list_item = _temp_list_item;
+	          TodoStore.emit(CHANGE_EVENT);
+	        }
+	        break;
+	
+	      case "VIEW_ITEM":
+	        _list_item = action.info;
+	        TodoStore.emit(VIEW_EVENT);
 	        break;
 	
 	      case "REMOVE_ITEM":
@@ -23267,6 +23311,10 @@
 	
 	var _card_edit_content2 = _interopRequireDefault(_card_edit_content);
 	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23284,8 +23332,11 @@
 	    var _this = _possibleConstructorReturn(this, (ItemContent.__proto__ || Object.getPrototypeOf(ItemContent)).call(this));
 	
 	    _this.state = {
+	      info: {},
 	      currentView: "Edit"
 	    };
+	
+	    _this._viewItem = _this._viewItem.bind(_this);
 	    return _this;
 	  }
 	
@@ -23296,16 +23347,30 @@
 	        return _react2.default.createElement(
 	          "div",
 	          { className: "card" },
-	          _react2.default.createElement(_card_edit_content2.default, null),
-	          _react2.default.createElement(_card_save_action2.default, { changeState: this._editState.bind(this) })
+	          _react2.default.createElement(_card_edit_content2.default, { info: this.state.info }),
+	          _react2.default.createElement(_card_save_action2.default, { changeState: this._editState.bind(this), info: this.state.info })
 	        );
 	      }
 	      return _react2.default.createElement(
 	        "div",
 	        { className: "card" },
-	        _react2.default.createElement(_card_text_content2.default, null),
-	        _react2.default.createElement(_card_edit_action2.default, { changeState: this._saveState.bind(this) })
+	        _react2.default.createElement(_card_text_content2.default, { info: this.state.info }),
+	        _react2.default.createElement(_card_edit_action2.default, { info: this.state.info, changeState: this._saveState.bind(this) })
 	      );
+	    }
+	  }, {
+	    key: "componentDidMount",
+	    value: function componentDidMount() {
+	      _todo_store2.default.addViewListener(this._viewItem);
+	      _todo_store2.default.addChangeListener(this._viewItem);
+	    }
+	  }, {
+	    key: "_viewItem",
+	    value: function _viewItem() {
+	      this.setState({
+	        info: _todo_store2.default.getListItem(),
+	        currentView: "Edit"
+	      });
 	    }
 	  }, {
 	    key: "_saveState",
@@ -23357,24 +23422,39 @@
 	  function CardTextContent() {
 	    _classCallCheck(this, CardTextContent);
 	
-	    return _possibleConstructorReturn(this, (CardTextContent.__proto__ || Object.getPrototypeOf(CardTextContent)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (CardTextContent.__proto__ || Object.getPrototypeOf(CardTextContent)).call(this));
+	
+	    var defaultInfo = {
+	      title: "Please Select List Item to View",
+	      description: "No List Item Selected"
+	    };
+	
+	    //let info = this.props.info.title ? this.props.info : defaultInfo;
+	    _this.state = {
+	      info: defaultInfo
+	    };
+	    return _this;
 	  }
 	
 	  _createClass(CardTextContent, [{
 	    key: "render",
 	    value: function render() {
+	      var info = this.props.info.title ? this.props.info : this.state.info;
+	      var title = info.title;
+	      var description = info.description;
+	
 	      return _react2.default.createElement(
 	        "div",
 	        { className: "card-content white-text" },
 	        _react2.default.createElement(
 	          "span",
 	          { className: "card-title" },
-	          "Card Title"
+	          title
 	        ),
 	        _react2.default.createElement(
 	          "p",
 	          null,
-	          "I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively."
+	          description
 	        )
 	      );
 	    }
@@ -23398,13 +23478,15 @@
 	  value: true
 	});
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 175);
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -23426,20 +23508,46 @@
 	  _createClass(CardEditAction, [{
 	    key: "render",
 	    value: function render() {
+	      var cardActions = this._getCardActions();
 	      return _react2.default.createElement(
 	        "div",
 	        { className: "card-action" },
-	        _react2.default.createElement(
-	          "a",
-	          { href: "#" },
-	          "Delete"
-	        ),
-	        _react2.default.createElement(
-	          "a",
-	          { href: "#", onClick: this._changeState.bind(this) },
-	          "Edit"
-	        )
+	        cardActions
 	      );
+	    }
+	  }, {
+	    key: "_getCardActions",
+	    value: function _getCardActions() {
+	      var _this2 = this;
+	
+	      var info = this.props.info.title != undefined;
+	
+	      if (info) {
+	        var _ret = function () {
+	          var index = 1;
+	          return {
+	            v: ['Delete', 'Edit'].map(function (action) {
+	              index += 1;
+	              if (action == 'Edit') {
+	                return _react2.default.createElement(
+	                  "a",
+	                  { href: "#", onClick: _this2._changeState.bind(_this2), key: index },
+	                  "Edit"
+	                );
+	              } else {
+	                return _react2.default.createElement(
+	                  "a",
+	                  { href: "#", key: index },
+	                  "Delete"
+	                );
+	              }
+	            })
+	          };
+	        }();
+	
+	        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+	      }
+	      return _react2.default.createElement("div", null);
 	    }
 	  }, {
 	    key: "_changeState",
@@ -23477,6 +23585,8 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23491,7 +23601,11 @@
 	  function CardSaveAction() {
 	    _classCallCheck(this, CardSaveAction);
 	
-	    return _possibleConstructorReturn(this, (CardSaveAction.__proto__ || Object.getPrototypeOf(CardSaveAction)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (CardSaveAction.__proto__ || Object.getPrototypeOf(CardSaveAction)).call(this));
+	
+	    _this._updateItem = _this._updateItem.bind(_this);
+	    _this._changeState = _this._changeState.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(CardSaveAction, [{
@@ -23502,12 +23616,12 @@
 	        { className: "card-action" },
 	        _react2.default.createElement(
 	          "a",
-	          { href: "#", onClick: this._changeState.bind(this) },
+	          { href: "#", onClick: this._changeState },
 	          "Discard"
 	        ),
 	        _react2.default.createElement(
 	          "a",
-	          { href: "#" },
+	          { href: "#", onClick: this._updateItem },
 	          "Save"
 	        )
 	      );
@@ -23516,6 +23630,11 @@
 	    key: "_changeState",
 	    value: function _changeState() {
 	      this.props.changeState();
+	    }
+	  }, {
+	    key: "_updateItem",
+	    value: function _updateItem() {
+	      (0, _todo_actions.updateItem)(this.props.info.id);
 	    }
 	  }]);
 	
@@ -23543,6 +23662,10 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23557,22 +23680,41 @@
 	  function CardEditContent() {
 	    _classCallCheck(this, CardEditContent);
 	
-	    return _possibleConstructorReturn(this, (CardEditContent.__proto__ || Object.getPrototypeOf(CardEditContent)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (CardEditContent.__proto__ || Object.getPrototypeOf(CardEditContent)).call(this));
+	
+	    _this._updateTempListItem = _this._updateTempListItem.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(CardEditContent, [{
 	    key: "render",
 	    value: function render() {
+	      var _this2 = this;
+	
+	      var title = this.props.info.title;
+	      var textarea = this.props.info.description;
 	      return _react2.default.createElement(
 	        "div",
 	        { className: "card-edit-content white-text" },
 	        _react2.default.createElement(
 	          "span",
 	          { className: "card-title" },
-	          "Editing Card Title"
+	          "Editing " + title
 	        ),
-	        _react2.default.createElement("textarea", { className: "materialize-textarea" })
+	        _react2.default.createElement(
+	          "textarea",
+	          { className: "materialize-textarea", ref: function ref(ele) {
+	              return _this2.body = ele;
+	            }, onKeyUp: this._updateTempListItem },
+	          textarea
+	        )
 	      );
+	    }
+	  }, {
+	    key: "_updateTempListItem",
+	    value: function _updateTempListItem() {
+	      var temp_list_item = Object.assign({}, this.props.info, { description: this.body.value });
+	      _todo_store2.default.setTempItem(temp_list_item);
 	    }
 	  }]);
 	
