@@ -22085,6 +22085,10 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _reactDom = __webpack_require__(/*! react-dom */ 34);
+	
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22105,6 +22109,8 @@
 	  _createClass(ListItem, [{
 	    key: "render",
 	    value: function render() {
+	      var _this2 = this;
+	
 	      var title = this.props.info.title;
 	      var description = this.props.info.description;
 	
@@ -22116,7 +22122,9 @@
 	          { className: "visible-content" },
 	          _react2.default.createElement(
 	            "span",
-	            { className: "item-text" },
+	            { className: "item-text", ref: function ref(element) {
+	                return _this2.element = element;
+	              } },
 	            title
 	          ),
 	          _react2.default.createElement(
@@ -22150,6 +22158,22 @@
 	          )
 	        )
 	      );
+	    }
+	  }, {
+	    key: "componentDidMount",
+	    value: function componentDidMount() {
+	      this._attachListener();
+	    }
+	  }, {
+	    key: "_attachListener",
+	    value: function _attachListener() {
+	      var node = _reactDom2.default.findDOMNode(this);
+	      $(node).click(function () {
+	        var context = $(node).closest('.collection-item');
+	        $('li.collection-item').find('.invisble-content').not(context.find('.invisible-content')).hide();
+	
+	        context.find('.invisible-content').toggle("slow");
+	      });
 	    }
 	  }]);
 	
@@ -22818,7 +22842,7 @@
 	      case "SEARCH_ITEM":
 	        var pattern = new RegExp(action.text, "ig");
 	        _search_list = _store.list.filter(function (item) {
-	          return pattern.test(item.title);
+	          return item.title.match(pattern);
 	        });
 	        TodoStore.emit(SEARCH_EVENT);
 	        break;

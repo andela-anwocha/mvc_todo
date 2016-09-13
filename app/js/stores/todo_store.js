@@ -66,7 +66,7 @@ AppDispatcher.register((payload) => {
 
     case "SEARCH_ITEM":
       let pattern = new RegExp(action.text, "ig");
-      _search_list = _store.list.filter(item => pattern.test(item.title) );
+      _search_list = _store.list.filter((item) => { return item.title.match(pattern) } );
       TodoStore.emit(SEARCH_EVENT);
       break;
 
