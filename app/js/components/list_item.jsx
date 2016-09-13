@@ -1,12 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { viewItem } from "../actions/todo_actions.js";
+import { viewItem, updateItem } from "../actions/todo_actions.js";
+import TodoStore from "../stores/todo_store.js";
 
 class ListItem extends React.Component {
 
     constructor(){
       super();
       this._viewItem = this._viewItem.bind(this);
+      this._checkListener = this._checkListener.bind(this);
     }
 
     render(){
@@ -19,7 +21,7 @@ class ListItem extends React.Component {
                   <a href="#!" className="secondary-content">
                     <div className="switch">
                       <label>
-                        <input type="checkbox" />
+                        <input type="checkbox" onChange={this._checkListener} />
                         <span className="lever"></span> Done
                       </label>
                     </div>
@@ -38,6 +40,7 @@ class ListItem extends React.Component {
 
     componentDidMount(){
       this._attachListener();
+      this._updateCheckElement();
     }
 
     _attachListener(){
@@ -53,6 +56,19 @@ class ListItem extends React.Component {
 
     _viewItem(){
       viewItem(this.props.info);
+    }
+
+    _updateCheckElement(){
+      let node = ReactDOM.findDOMNode(this);
+      $(node).find('input').prop("checked", this.props.info.done);
+    }
+
+    _checkListener(event){
+      let node = ReactDOM.findDOMNode(this);
+      let checkValue = $(node).find('input').is(':checked');
+      let tempItem = Object.assign({}, this.props.info, {done: checkValue});
+      TodoStore.setTempItem(tempItem);
+      updateItem(this.props.info.id);
     }
 }
 

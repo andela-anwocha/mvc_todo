@@ -7,8 +7,8 @@ const VIEW_EVENT = 'view';
 
 let _store = {
   list: [
-          {id: 1, title: "Wake the Dog", description: "Dog should wake"},
-          {id: 2, title: "Wash the car", description: "Car Clean" }
+          { id: 1, title: "Wake the Dog", description: "Dog should wake", done: true },
+          { id: 2, title: "Wash the car", description: "Car Clean", done: false }
         ],
   editing: false
 };
@@ -60,7 +60,8 @@ AppDispatcher.register((payload) => {
   switch (action.actionType) {
 
     case "NEW_ITEM":
-      _store.editing = true;
+      console.log(action.item);
+      _store.list = _store.list.concat([action.item]);
       TodoStore.emit(CHANGE_EVENT);
       break;
 

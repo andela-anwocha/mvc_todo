@@ -65,11 +65,21 @@
 	
 	var _todo_store2 = _interopRequireDefault(_todo_store);
 	
+	var _add_item_modal = __webpack_require__(/*! ./add_item_modal.jsx */ 189);
+	
+	var _add_item_modal2 = _interopRequireDefault(_add_item_modal);
+	
+	var _delete_item_modal = __webpack_require__(/*! ./delete_item_modal.jsx */ 190);
+	
+	var _delete_item_modal2 = _interopRequireDefault(_delete_item_modal);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	(0, _reactDom.render)(_react2.default.createElement(_list.List, null), document.getElementById('container'));
 	(0, _reactDom.render)(_react2.default.createElement(_add_item_button.AddItemButton, null), document.getElementById('add-container'));
 	(0, _reactDom.render)(_react2.default.createElement(_item_content.ItemContent, null), document.getElementById('item-content'));
+	(0, _reactDom.render)(_react2.default.createElement(_add_item_modal2.default, null), document.getElementById('add-item-modal'));
+	(0, _reactDom.render)(_react2.default.createElement(_delete_item_modal2.default, null), document.getElementById('delete-item-modal'));
 
 /***/ },
 /* 1 */
@@ -22091,6 +22101,10 @@
 	
 	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
 	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22108,6 +22122,7 @@
 	    var _this = _possibleConstructorReturn(this, (ListItem.__proto__ || Object.getPrototypeOf(ListItem)).call(this));
 	
 	    _this._viewItem = _this._viewItem.bind(_this);
+	    _this._checkListener = _this._checkListener.bind(_this);
 	    return _this;
 	  }
 	
@@ -22141,7 +22156,7 @@
 	              _react2.default.createElement(
 	                "label",
 	                null,
-	                _react2.default.createElement("input", { type: "checkbox" }),
+	                _react2.default.createElement("input", { type: "checkbox", onChange: this._checkListener }),
 	                _react2.default.createElement("span", { className: "lever" }),
 	                " Done"
 	              )
@@ -22168,6 +22183,7 @@
 	    key: "componentDidMount",
 	    value: function componentDidMount() {
 	      this._attachListener();
+	      this._updateCheckElement();
 	    }
 	  }, {
 	    key: "_attachListener",
@@ -22185,6 +22201,21 @@
 	    key: "_viewItem",
 	    value: function _viewItem() {
 	      (0, _todo_actions.viewItem)(this.props.info);
+	    }
+	  }, {
+	    key: "_updateCheckElement",
+	    value: function _updateCheckElement() {
+	      var node = _reactDom2.default.findDOMNode(this);
+	      $(node).find('input').prop("checked", this.props.info.done);
+	    }
+	  }, {
+	    key: "_checkListener",
+	    value: function _checkListener(event) {
+	      var node = _reactDom2.default.findDOMNode(this);
+	      var checkValue = $(node).find('input').is(':checked');
+	      var tempItem = Object.assign({}, this.props.info, { done: checkValue });
+	      _todo_store2.default.setTempItem(tempItem);
+	      (0, _todo_actions.updateItem)(this.props.info.id);
 	    }
 	  }]);
 	
@@ -22217,9 +22248,10 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function addItem() {
+	function addItem(item) {
 	  _app_dispatcher2.default.handleViewAction({
-	    actionType: "NEW_ITEM"
+	    actionType: "NEW_ITEM",
+	    item: item
 	  });
 	}
 	
@@ -22788,7 +22820,7 @@
 	var VIEW_EVENT = 'view';
 	
 	var _store = {
-	  list: [{ id: 1, title: "Wake the Dog", description: "Dog should wake" }, { id: 2, title: "Wash the car", description: "Car Clean" }],
+	  list: [{ id: 1, title: "Wake the Dog", description: "Dog should wake", done: true }, { id: 2, title: "Wash the car", description: "Car Clean", done: false }],
 	  editing: false
 	};
 	
@@ -22859,7 +22891,8 @@
 	    switch (action.actionType) {
 	
 	      case "NEW_ITEM":
-	        _store.editing = true;
+	        console.log(action.item);
+	        _store.list = _store.list.concat([action.item]);
 	        TodoStore.emit(CHANGE_EVENT);
 	        break;
 	
@@ -23248,7 +23281,10 @@
 	  function AddItemButton() {
 	    _classCallCheck(this, AddItemButton);
 	
-	    return _possibleConstructorReturn(this, (AddItemButton.__proto__ || Object.getPrototypeOf(AddItemButton)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (AddItemButton.__proto__ || Object.getPrototypeOf(AddItemButton)).call(this));
+	
+	    _this._openModal = _this._openModal.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(AddItemButton, [{
@@ -23256,10 +23292,10 @@
 	    value: function render() {
 	      return _react2.default.createElement(
 	        "div",
-	        { className: "fixed-action-btn horizontal click-to-toggle" },
+	        { className: "fixed-action-btn horizontal" },
 	        _react2.default.createElement(
 	          "a",
-	          { className: "btn-floating btn-large red" },
+	          { className: "btn-floating btn-large red modal-trigger", onClick: this._openModal },
 	          _react2.default.createElement(
 	            "i",
 	            { className: "material-icons" },
@@ -23267,6 +23303,11 @@
 	          )
 	        )
 	      );
+	    }
+	  }, {
+	    key: "_openModal",
+	    value: function _openModal() {
+	      $('#modal1').openModal();
 	    }
 	  }]);
 	
@@ -23502,7 +23543,11 @@
 	  function CardEditAction() {
 	    _classCallCheck(this, CardEditAction);
 	
-	    return _possibleConstructorReturn(this, (CardEditAction.__proto__ || Object.getPrototypeOf(CardEditAction)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (CardEditAction.__proto__ || Object.getPrototypeOf(CardEditAction)).call(this));
+	
+	    _this._changeState = _this._changeState.bind(_this);
+	    _this._deleteItem = _this._deleteItem.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(CardEditAction, [{
@@ -23524,20 +23569,20 @@
 	
 	      if (info) {
 	        var _ret = function () {
-	          var index = 1;
+	          var index = 0;
 	          return {
 	            v: ['Delete', 'Edit'].map(function (action) {
 	              index += 1;
 	              if (action == 'Edit') {
 	                return _react2.default.createElement(
 	                  "a",
-	                  { href: "#", onClick: _this2._changeState.bind(_this2), key: index },
+	                  { href: "#", onClick: _this2._changeState, key: index },
 	                  "Edit"
 	                );
 	              } else {
 	                return _react2.default.createElement(
 	                  "a",
-	                  { href: "#", key: index },
+	                  { href: "#", key: index, onClick: _this2._deleteItem },
 	                  "Delete"
 	                );
 	              }
@@ -23548,6 +23593,11 @@
 	        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 	      }
 	      return _react2.default.createElement("div", null);
+	    }
+	  }, {
+	    key: "_deleteItem",
+	    value: function _deleteItem() {
+	      $('#modal2').openModal();
 	    }
 	  }, {
 	    key: "_changeState",
@@ -23722,6 +23772,204 @@
 	}(_react2.default.Component);
 	
 	exports.default = CardEditContent;
+
+/***/ },
+/* 189 */
+/*!**********************************************!*\
+  !*** ./app/js/components/add_item_modal.jsx ***!
+  \**********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
+	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var AddItemModal = function (_React$Component) {
+	  _inherits(AddItemModal, _React$Component);
+	
+	  function AddItemModal() {
+	    _classCallCheck(this, AddItemModal);
+	
+	    var _this = _possibleConstructorReturn(this, (AddItemModal.__proto__ || Object.getPrototypeOf(AddItemModal)).call(this));
+	
+	    _this._addItem = _this._addItem.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(AddItemModal, [{
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+	
+	      return _react2.default.createElement(
+	        "div",
+	        { id: "modal1", className: "modal bottom-sheet" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "modal-content" },
+	          _react2.default.createElement(
+	            "div",
+	            { className: "modal-header" },
+	            _react2.default.createElement(
+	              "h4",
+	              null,
+	              "Add List Item"
+	            )
+	          ),
+	          _react2.default.createElement(
+	            "div",
+	            { className: "row" },
+	            _react2.default.createElement(
+	              "div",
+	              { className: "input-field col s6 level-up" },
+	              _react2.default.createElement("input", { placeholder: "Placeholder", id: "title", type: "text", className: "validate", ref: function ref(title) {
+	                  return _this2._title = title;
+	                } }),
+	              _react2.default.createElement(
+	                "label",
+	                { htmlFor: "title" },
+	                "Title"
+	              )
+	            ),
+	            _react2.default.createElement(
+	              "div",
+	              { className: "input-field col s6" },
+	              _react2.default.createElement("textarea", { className: "materialize-textarea", ref: function ref(description) {
+	                  return _this2._description = description;
+	                } }),
+	              _react2.default.createElement(
+	                "label",
+	                { htmlFor: "description" },
+	                "Description"
+	              )
+	            )
+	          )
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "modal-footer" },
+	          _react2.default.createElement(
+	            "a",
+	            { href: "#!", className: "modal-action modal-close btn", onClick: this._addItem },
+	            "Add"
+	          )
+	        )
+	      );
+	    }
+	  }, {
+	    key: "_addItem",
+	    value: function _addItem() {
+	      var id = _todo_store2.default.getList().list.length + 1;
+	      var item = {
+	        id: id,
+	        title: this._title.value,
+	        description: this._description.value,
+	        done: false
+	      };
+	      (0, _todo_actions.addItem)(item);
+	    }
+	  }]);
+	
+	  return AddItemModal;
+	}(_react2.default.Component);
+	
+	exports.default = AddItemModal;
+
+/***/ },
+/* 190 */
+/*!*************************************************!*\
+  !*** ./app/js/components/delete_item_modal.jsx ***!
+  \*************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var DeleteItemModal = function (_React$Component) {
+	  _inherits(DeleteItemModal, _React$Component);
+	
+	  function DeleteItemModal() {
+	    _classCallCheck(this, DeleteItemModal);
+	
+	    return _possibleConstructorReturn(this, (DeleteItemModal.__proto__ || Object.getPrototypeOf(DeleteItemModal)).apply(this, arguments));
+	  }
+	
+	  _createClass(DeleteItemModal, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        { id: "modal2", className: "modal" },
+	        _react2.default.createElement(
+	          "div",
+	          { className: "modal-content" },
+	          _react2.default.createElement(
+	            "h4",
+	            null,
+	            "Delete"
+	          ),
+	          _react2.default.createElement(
+	            "p",
+	            null,
+	            "Are you sure you want to delete this item?"
+	          )
+	        ),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "modal-footer delete" },
+	          _react2.default.createElement(
+	            "a",
+	            { href: "#!", className: " modal-action modal-close btn" },
+	            "Yes"
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return DeleteItemModal;
+	}(_react2.default.Component);
+	
+	exports.default = DeleteItemModal;
 
 /***/ }
 /******/ ]);

@@ -1,8 +1,9 @@
 import AppDispatcher from '../dispatcher/app_dispatcher.js';
 
-export function addItem() {
+export function addItem(item) {
   AppDispatcher.handleViewAction({
-    actionType: "NEW_ITEM"
+    actionType: "NEW_ITEM",
+    item: item
   });
 }
 

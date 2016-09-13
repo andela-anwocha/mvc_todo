@@ -31,3 +31,12 @@
   height: auto;
   padding: 10px;
 }
+
+.level-up{
+  top: 47px;
+}
+
+.modal-footer:not(.delete) {
+  width: 100px !important;
+  margin: auto !important;
+}
