@@ -21,10 +21,10 @@ export function viewItem(info) {
   });
 }
 
-export function removeItem(index) {
+export function removeItem(item) {
   AppDispatcher.handleViewAction({
     actionType: "REMOVE_ITEM",
-    index: index,
+    item: item,
   });
 }
 

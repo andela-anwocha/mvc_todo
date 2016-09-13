@@ -22050,6 +22050,7 @@
 	    value: function componentDidMount() {
 	      _todo_store2.default.addChangeListener(this._onChange);
 	      _todo_store2.default.addSearchListener(this._onSearch);
+	      _todo_store2.default.addDeleteListener(this._onChange);
 	    }
 	  }, {
 	    key: "_onChange",
@@ -22123,6 +22124,7 @@
 	
 	    _this._viewItem = _this._viewItem.bind(_this);
 	    _this._checkListener = _this._checkListener.bind(_this);
+	    _this._deleteItem = _this._deleteItem.bind(_this);
 	    return _this;
 	  }
 	
@@ -22173,7 +22175,7 @@
 	          ),
 	          _react2.default.createElement(
 	            "a",
-	            { className: "right-btn btn-flat" },
+	            { className: "right-btn btn-flat", onClick: this._deleteItem },
 	            "Delete"
 	          )
 	        )
@@ -22216,6 +22218,12 @@
 	      var tempItem = Object.assign({}, this.props.info, { done: checkValue });
 	      _todo_store2.default.setTempItem(tempItem);
 	      (0, _todo_actions.updateItem)(this.props.info.id);
+	    }
+	  }, {
+	    key: "_deleteItem",
+	    value: function _deleteItem() {
+	      $('#modal2').openModal();
+	      _todo_store2.default.setDeleteItem(this.props.info);
 	    }
 	  }]);
 	
@@ -22269,10 +22277,10 @@
 	  });
 	}
 	
-	function removeItem(index) {
+	function removeItem(item) {
 	  _app_dispatcher2.default.handleViewAction({
 	    actionType: "REMOVE_ITEM",
-	    index: index
+	    item: item
 	  });
 	}
 	
@@ -22771,7 +22779,9 @@
 	          { className: "btn-container" },
 	          _react2.default.createElement(
 	            "a",
-	            { className: "btn-flat" },
+	            { className: "btn-flat", onClick: function onClick() {
+	                return $('#modal1').openModal();
+	              } },
 	            "Add Item"
 	          )
 	        )
@@ -22818,6 +22828,7 @@
 	var CHANGE_EVENT = 'change';
 	var SEARCH_EVENT = 'search';
 	var VIEW_EVENT = 'view';
+	var DELETE_EVENT = 'delete';
 	
 	var _store = {
 	  list: [{ id: 1, title: "Wake the Dog", description: "Dog should wake", done: true }, { id: 2, title: "Wash the car", description: "Car Clean", done: false }],
@@ -22827,6 +22838,7 @@
 	var _search_list = void 0;
 	var _list_item = void 0;
 	var _temp_list_item = void 0;
+	var _delete_item = void 0;
 	
 	var TodoStoreClass = function (_EventEmitter) {
 	  _inherits(TodoStoreClass, _EventEmitter);
@@ -22853,6 +22865,11 @@
 	      this.on(VIEW_EVENT, cb);
 	    }
 	  }, {
+	    key: 'addDeleteListener',
+	    value: function addDeleteListener(cb) {
+	      this.on(DELETE_EVENT, cb);
+	    }
+	  }, {
 	    key: 'removeChangeListener',
 	    value: function removeChangeListener(cb) {
 	      this.removeListener(CHANGE_EVENT, cb);
@@ -22877,6 +22894,16 @@
 	    value: function setTempItem(item) {
 	      _temp_list_item = item;
 	    }
+	  }, {
+	    key: 'setDeleteItem',
+	    value: function setDeleteItem(item) {
+	      _delete_item = item;
+	    }
+	  }, {
+	    key: 'getDeleteItem',
+	    value: function getDeleteItem() {
+	      return _delete_item;
+	    }
 	  }]);
 	
 	  return TodoStoreClass;
@@ -22891,7 +22918,6 @@
 	    switch (action.actionType) {
 	
 	      case "NEW_ITEM":
-	        console.log(action.item);
 	        _store.list = _store.list.concat([action.item]);
 	        TodoStore.emit(CHANGE_EVENT);
 	        break;
@@ -22910,10 +22936,10 @@
 	        break;
 	
 	      case "REMOVE_ITEM":
-	        _store.list = _store.list.filter(function (item, index) {
-	          return index !== action.index;
-	        });
-	        TodoStore.emit(CHANGE_EVENT);
+	        var item = action.item;
+	        var index = _store.list.indexOf(item);
+	        _store.list.splice(index, 1);
+	        TodoStore.emit(DELETE_EVENT);
 	        break;
 	
 	      case "SEARCH_ITEM":
@@ -23378,6 +23404,7 @@
 	    };
 	
 	    _this._viewItem = _this._viewItem.bind(_this);
+	    _this._onDelete = _this._onDelete.bind(_this);
 	    return _this;
 	  }
 	
@@ -23404,6 +23431,7 @@
 	    value: function componentDidMount() {
 	      _todo_store2.default.addViewListener(this._viewItem);
 	      _todo_store2.default.addChangeListener(this._viewItem);
+	      _todo_store2.default.addDeleteListener(this._onDelete);
 	    }
 	  }, {
 	    key: "_viewItem",
@@ -23412,6 +23440,17 @@
 	        info: _todo_store2.default.getListItem(),
 	        currentView: "Edit"
 	      });
+	    }
+	  }, {
+	    key: "_onDelete",
+	    value: function _onDelete() {
+	      var item = _todo_store2.default.getDeleteItem();
+	      if (this.state.info.id != undefined && item.id == this.state.info.id) {
+	        this.setState({
+	          info: {},
+	          currentView: "Edit"
+	        });
+	      }
 	    }
 	  }, {
 	    key: "_saveState",
@@ -23529,6 +23568,10 @@
 	
 	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
 	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23598,6 +23641,7 @@
 	    key: "_deleteItem",
 	    value: function _deleteItem() {
 	      $('#modal2').openModal();
+	      _todo_store2.default.setDeleteItem(this.props.info);
 	    }
 	  }, {
 	    key: "_changeState",
@@ -23916,6 +23960,12 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _todo_store = __webpack_require__(/*! ../stores/todo_store.js */ 181);
+	
+	var _todo_store2 = _interopRequireDefault(_todo_store);
+	
+	var _todo_actions = __webpack_require__(/*! ../actions/todo_actions.js */ 174);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23930,7 +23980,10 @@
 	  function DeleteItemModal() {
 	    _classCallCheck(this, DeleteItemModal);
 	
-	    return _possibleConstructorReturn(this, (DeleteItemModal.__proto__ || Object.getPrototypeOf(DeleteItemModal)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (DeleteItemModal.__proto__ || Object.getPrototypeOf(DeleteItemModal)).call(this));
+	
+	    _this._deleteItem = _this._deleteItem.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(DeleteItemModal, [{
@@ -23958,11 +24011,16 @@
 	          { className: "modal-footer delete" },
 	          _react2.default.createElement(
 	            "a",
-	            { href: "#!", className: " modal-action modal-close btn" },
+	            { href: "#!", className: " modal-action modal-close btn", onClick: this._deleteItem },
 	            "Yes"
 	          )
 	        )
 	      );
+	    }
+	  }, {
+	    key: "_deleteItem",
+	    value: function _deleteItem() {
+	      (0, _todo_actions.removeItem)(_todo_store2.default.getDeleteItem());
 	    }
 	  }]);
 	

@@ -35,6 +35,7 @@ class List extends React.Component {
   componentDidMount(){
     TodoStore.addChangeListener(this._onChange);
     TodoStore.addSearchListener(this._onSearch);
+    TodoStore.addDeleteListener(this._onChange);
   }
 
   _onChange(){

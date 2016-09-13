@@ -14,6 +14,7 @@ class ItemContent extends React.Component {
     };
 
     this._viewItem = this._viewItem.bind(this);
+    this._onDelete = this._onDelete.bind(this);
   }
 
   render() {
@@ -32,6 +33,7 @@ class ItemContent extends React.Component {
   componentDidMount(){
     TodoStore.addViewListener(this._viewItem);
     TodoStore.addChangeListener(this._viewItem);
+    TodoStore.addDeleteListener(this._onDelete);
   }
 
   _viewItem(){
@@ -39,6 +41,16 @@ class ItemContent extends React.Component {
       info: TodoStore.getListItem(),
       currentView: "Edit"
     });
+  }
+
+  _onDelete(){
+    let item = TodoStore.getDeleteItem();
+    if ((this.state.info.id != undefined) && (item.id == this.state.info.id)){
+      this.setState({
+        info: {},
+        currentView: "Edit"
+      });
+    }
   }
 
   _saveState(){

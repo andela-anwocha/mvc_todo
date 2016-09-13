@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 const CHANGE_EVENT = 'change';
 const SEARCH_EVENT = 'search';
 const VIEW_EVENT = 'view';
+const DELETE_EVENT = 'delete';
 
 let _store = {
   list: [
@@ -16,6 +17,7 @@ let _store = {
 let _search_list;
 let _list_item;
 let _temp_list_item;
+let _delete_item;
 
 class TodoStoreClass extends EventEmitter {
 
@@ -29,6 +31,10 @@ class TodoStoreClass extends EventEmitter {
 
   addViewListener(cb) {
     this.on(VIEW_EVENT, cb);
+  }
+
+  addDeleteListener(cb) {
+    this.on(DELETE_EVENT, cb);
   }
 
   removeChangeListener(cb) {
@@ -51,6 +57,14 @@ class TodoStoreClass extends EventEmitter {
     _temp_list_item = item;
   }
 
+  setDeleteItem(item){
+    _delete_item = item;
+  }
+
+  getDeleteItem(){
+    return _delete_item;
+  }
+
 }
 
 const TodoStore = new TodoStoreClass();
@@ -60,7 +74,6 @@ AppDispatcher.register((payload) => {
   switch (action.actionType) {
 
     case "NEW_ITEM":
-      console.log(action.item);
       _store.list = _store.list.concat([action.item]);
       TodoStore.emit(CHANGE_EVENT);
       break;
@@ -79,10 +92,10 @@ AppDispatcher.register((payload) => {
       break;
 
     case "REMOVE_ITEM":
-      _store.list = _store.list.filter((item, index) => {
-        return index !== action.index;
-      });
-      TodoStore.emit(CHANGE_EVENT);
+      let item = action.item;
+      let index = _store.list.indexOf(item);
+      _store.list.splice(index, 1);
+      TodoStore.emit(DELETE_EVENT);
       break;
 
     case "SEARCH_ITEM":

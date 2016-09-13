@@ -9,6 +9,7 @@ class ListItem extends React.Component {
       super();
       this._viewItem = this._viewItem.bind(this);
       this._checkListener = this._checkListener.bind(this);
+      this._deleteItem = this._deleteItem.bind(this);
     }
 
     render(){
@@ -31,7 +32,7 @@ class ListItem extends React.Component {
                   <a className="left-btn btn-flat" onClick={this._viewItem}>
                     View
                   </a>
-                  <a className="right-btn btn-flat">
+                  <a className="right-btn btn-flat" onClick={this._deleteItem}>
                     Delete
                   </a>
                 </div>
@@ -69,6 +70,11 @@ class ListItem extends React.Component {
       let tempItem = Object.assign({}, this.props.info, {done: checkValue});
       TodoStore.setTempItem(tempItem);
       updateItem(this.props.info.id);
+    }
+
+    _deleteItem(){
+      $('#modal2').openModal();
+      TodoStore.setDeleteItem(this.props.info);
     }
 }
 

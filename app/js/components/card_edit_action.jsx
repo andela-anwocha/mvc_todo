@@ -1,5 +1,6 @@
 import React from "react";
 import { addItem } from "../actions/todo_actions.js";
+import TodoStore from "../stores/todo_store.js";
 
 export default class CardEditAction extends React.Component {
 
@@ -36,6 +37,7 @@ export default class CardEditAction extends React.Component {
 
   _deleteItem(){
     $('#modal2').openModal();
+    TodoStore.setDeleteItem(this.props.info);
   }
 
   _changeState(){
